@@ -1,0 +1,5 @@
+name: 'Updates the Destiny Manifest'
+description: "Updates the Destiny Manifest in the repository to the latest version."
+runs:
+  using: 'node20'
+  main: '../../../dist/index.js'

@@ -1,0 +1,5 @@
+name: 'Check for Destiny Manifest updates'
+description: "Checks for new updates to the Destiny Manifest."
+runs:
+  using: 'node20'
+  main: '../../../dist/index.js'
