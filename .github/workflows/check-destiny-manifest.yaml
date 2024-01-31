@@ -1,0 +1,100 @@
+# This workflow runs every five minutes to check for updates to the Destiny Manifest.
+name: Cron - Check for Destiny Manifest updates
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+jobs:
+  check-manifest:
+    runs-on: ubuntu-latest
+    outputs:
+      skip_Update: ${{ steps.check-manifest.outputs.skip_update }}
+      latest_version: ${{ steps.check-manifest.outputs.latest_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          cache: pnpm
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Build Check-Manifest action
+        run: pnpm build-check-manifest
+
+      - name: Check for Destiny Manifest updates
+        id: check-manifest
+        env:
+          BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
+        uses: ./.github/actions/check-destiny-manifest
+
+  update-manifest:
+    needs: check-manifest
+    if: ${{ needs.check-manifest.outputs.skip_update == 'false'}}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          cache: pnpm
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Build Update-Manifest action
+        run: pnpm build-update-manifest
+
+      - name: Capture current Destiny Manifest version
+        id: current-manifest
+        run: |
+          echo "Current manifest version: $(cat latest.json)."
+          echo "version=$(cat latest.json)" >> "$GITHUB_OUTPUT"
+          
+      - name: Update Destiny Manifest
+        env:
+          BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
+        uses: ./.github/actions/update-destiny-manifest
+
+      - name: Commit new Destiny Manifest
+        uses: stefanzweifel/git-auto-commit-action@v5
+        id: auto-commit-action
+        with:
+          commit_message: Updated Destiny Manifest
+          commit_user_name: Destiny Manifest Bot
+          commit_user_email: ${{ secrets.MANIFEST_BOT_EMAIL }}
+          commit_author: ${{ secrets.AUTO_COMMIT_AUTHOR }}
+
+      - name: Check repository for changes
+        env:
+          CURRENT_VERSION: ${{ steps.current-manifest.outputs.version }}
+          NEW_VERSION: ${{ needs.check-manifest.outputs.latest_version }}
+          REPO_CHANGED: ${{ steps.auto-commit-action.outputs.changes_detected }}
+        run: |
+          if [ $REPO_CHANGED == 'true' ]; then
+            echo "::notice ::Successfully updated the Destiny Manifest: $CURRENT_VERSION -> \"$NEW_VERSION\"."
+            exit 0
+          else
+            echo "::error ::No changes were made to the repository even though a new Destiny Manifest was detected."
+            exit 1
+          fi
+          
