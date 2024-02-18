@@ -29,6 +29,6 @@ async function run() {
   core.setOutput("skip_update", "false");
   core.setOutput("current_version", `"${currentVersion}"`);
   core.setOutput("latest_version", latestVersion);
-}
+};
 
 await run();
