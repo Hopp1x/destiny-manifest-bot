@@ -1,3 +1,3 @@
 # d2-manifest-bot
 A GitHub Action for fetching the latest version of Bungie's Destiny Manifest.
-## Current manifest version: "224968.24.03.30.1517-1-bnet.54867"
+## Current manifest version: "225174.24.04.10.1730-2-bnet.54923"
