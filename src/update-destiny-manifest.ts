@@ -8,6 +8,7 @@ import {
   DestinyInventoryItemDefinition,
   DestinyPlugSetDefinition,
   DestinySeasonDefinition,
+  DestinySeasonPassDefinition,
   DestinyStatDefinition,
   DestinyStatGroupDefinition, 
   HttpClientConfig
@@ -19,6 +20,7 @@ interface DestinyManifest {
   InventoryItem?: { [hash: number]: DestinyInventoryItemDefinition },
   PlugSet?: { [hash: number]: DestinyPlugSetDefinition },
   Season?: { [hash: number]: DestinySeasonDefinition },
+  SeasonPass?: { [hash: number]: DestinySeasonPassDefinition },
   Stat?: { [hash: number]: DestinyStatDefinition },
   StatGroup?: { [hash: number]: DestinyStatGroupDefinition } 
 };
@@ -55,6 +57,7 @@ async function run() {
       "DestinyInventoryItemDefinition",
       "DestinyPlugSetDefinition",
       "DestinySeasonDefinition",
+      "DestinySeasonPassDefinition",
       "DestinyStatDefinition",
       "DestinyStatGroupDefinition"
     ],
@@ -65,6 +68,7 @@ async function run() {
     InventoryItem: manifestComponents.DestinyInventoryItemDefinition,
     PlugSet: manifestComponents.DestinyPlugSetDefinition,
     Season: manifestComponents.DestinySeasonDefinition,
+    SeasonPass: manifestComponents.DestinySeasonPassDefinition,
     Stat: manifestComponents.DestinyStatDefinition,
     StatGroup: manifestComponents.DestinyStatGroupDefinition
   };
